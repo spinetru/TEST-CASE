@@ -5,13 +5,11 @@ import sys
 def check_bit_correct(segm, checkbit, maskcheck):
 	y= segm & checkbit
 	x= segm & maskcheck
-#	print('------------------y,x=',bin(y), bin(x))
 	i=0
 	while (x>0):
 		if (x%2 >0):
 			 i=i+1
 		x=x>>1
-#	print('--------------segm:',bin(segm), '  y=',bin(y), '  x=',bin(x), '  i=',i)
 	if (0==i%2) :
 		return 1
 	else:
@@ -45,10 +43,7 @@ def check(segm):
         if parity_error==0:
                 return segm
         else:
-#		print ('-----ERRORvvvv----------')
-#		print ('corr1: ', bin(corr_bit), 'corr_shift: ', bin(corr_bit<<(15-parity_error)))
                 corrb = segm^(corr_bit<<(15-parity_error))
-#		print ('ERROR ',parity_error, bin(segm), 'corr: ', bin(corrb))
                 return  corrb
 #end def check()
 
@@ -65,7 +60,7 @@ def mainprog(f1,f2):
  k=3
  tmp=0
  while 1:
-  while(i<15):
+  while(i<15):  #i необходимо для проверки сколько байт читать из файла
    b1code=file.read(1)
    i=i+8
    if not b1code:
@@ -82,13 +77,13 @@ def mainprog(f1,f2):
   tbyte= (code& ( 2**(i-15)-1 ) )<< (15-(i-15)) # сохраняем в tbyte набор "лишних" бит 'xxxxxxxxxxxxpp1'&'000000000000111' << -> 'pp1000000000000'
 
   s=check(segm15)
-	#print (format(s, 'b').zfill(15))
-  s11=s&0b1111111
+	#print (format(s, 'b').zfill(15))  
+  s11=s&0b1111111             #Удаление контрольных битов, далее они не нужны 'pp1p234p56789AB' -> '123456789AB'
   s11=((s>>1)&0b1110000000)|s11
   s11=((s>>2)&0b10000000000)|s11
   s=s11
 
-
+#Ниже код склеивает/делит из считанного сегмента на отрезки по 8/16бит
   if k==3:
    b2w= s>>k
    tmp = s&0b111
@@ -113,26 +108,23 @@ def mainprog(f1,f2):
   if k==0:
    b2w=(tmp<<11)|s
    tmp=0
-	
-#	print ('k=', k, 'b2w=', b2w)
-  if k<3:
+
+  if k<3:            #обработка и запись в файл 8/16 бит. k вычисленно по таблице
    fw.write(bytearray(([b2w>>8])))
    fw.write(bytearray(([b2w&0b11111111])))
   else:
    fw.write(bytearray(([b2w])))
 
-  k=(k+3)&0b111
+  k=(k+3)&0b111 #счетчик остатка от 11бит декодированного сегмета после записи в файл 8/16 бит
   code=0
-  i=i-15
-	#print(code)
+  i=i-15 
 
  fw.close()
  file.close()
 
 
 
-
-
+#main prog
 if (len(sys.argv)<3):
 	print ('Use: ', sys.argv[0], 'file.encode file.to.decode' )
 else:
