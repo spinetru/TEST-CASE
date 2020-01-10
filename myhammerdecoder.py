@@ -18,13 +18,13 @@ def check_bit_correct(segm, checkbit, maskcheck):
 
 
 def check(segm):
-	parity_error=0
-	corr_bit=1
+        parity_error=0
+        corr_bit=1
 	#1bit
-	if check_bit_correct(segm,0b100000000000000, 0b101010101010101):
-		parity_error+=0
-	else:
-		parity_error+=1
+        if check_bit_correct(segm,0b100000000000000, 0b101010101010101):
+                parity_error+=0
+        else:
+                parity_error+=1
 	#2bit
         if check_bit_correct(segm,0b010000000000000, 0b011001100110011):
                 parity_error+=0
@@ -41,14 +41,14 @@ def check(segm):
         else:
                 parity_error+=8
 
-	if parity_error==0:
-		return segm
-	else:
+        if parity_error==0:
+                return segm
+        else:
 #		print ('-----ERRORvvvv----------')
 #		print ('corr1: ', bin(corr_bit), 'corr_shift: ', bin(corr_bit<<(15-parity_error)))
-		corrb = segm^(corr_bit<<(15-parity_error))
+                corrb = segm^(corr_bit<<(15-parity_error))
 #		print ('ERROR ',parity_error, bin(segm), 'corr: ', bin(corrb))
-		return  corrb
+                return  corrb
 #end def check()
 
 
